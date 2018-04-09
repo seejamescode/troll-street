@@ -1,11 +1,38 @@
 import compression from "compression";
 import express from "express";
 import Fuse from "fuse.js";
+import parallel from "async/parallel";
 import { parse } from "node-html-parser";
 import path from "path";
 import request from "request";
+import Twitter from "twitter";
+import "now-env";
 
 const app = express();
+const twitterCredentialsBase64Encoded = new Buffer(
+  `${process.env.twitter_consumer_key}:${process.env.twitter_consumer_secret}`
+).toString("base64");
+let twitterClient;
+
+request(
+  {
+    url: "https://api.twitter.com/oauth2/token",
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${twitterCredentialsBase64Encoded}`,
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    },
+    body: "grant_type=client_credentials"
+  },
+  (err, resp, body) => {
+    twitterClient = new Twitter({
+      bearer_token: JSON.parse(body).access_token,
+      twitter_consumer_key: process.env.twitter_consumer_key,
+      twitter_consumer_secret: process.env.twitter_consumer_secret
+    });
+  }
+);
+
 const port = process.env.PORT || 8080;
 const apiStocks = "https://api.iextrading.com/1.0";
 let fuse;
@@ -47,7 +74,10 @@ const updateActive = () => {
       const results = JSON.parse(body);
       active =
         !error && response.statusCode == 200 && results.length > 0
-          ? body
+          ? results
+              .map(symbol => symbol.symbol)
+              .slice(0, 50)
+              .join(",")
           : active;
     }
   );
@@ -73,15 +103,75 @@ if (process.env.NODE_ENV === "production") {
 
 // Symbols all
 app.get("/symbols/", function(req, res) {
-  res.send(active);
+  request(
+    {
+      url: `${apiStocks}/stock/market/batch?symbols=${active}&types=quote,chart&range=dynamic`
+    },
+    (error, response, body) => {
+      if (!error && response.statusCode == 200) {
+        res.send(JSON.parse(body));
+      }
+    }
+  );
 });
 
 // Symbols search
 app.get("/symbols/:query", function(req, res) {
-  res.send(fuse.search(req.params.query).slice(0, 50));
+  const filtered = fuse
+    .search(req.params.query)
+    .map(symbol => symbol.symbol)
+    .slice(0, 50)
+    .join(",");
+
+  request(
+    {
+      url: `${apiStocks}/stock/market/batch?symbols=${filtered}&types=quote,chart&range=dynamic`
+    },
+    (error, response, body) => {
+      if (!error && response.statusCode == 200) {
+        res.send(JSON.parse(body));
+      }
+    }
+  );
 });
 
 // Specific symbol data
+app.get("/symbol/:symbol", function(req, res) {
+  parallel(
+    {
+      iex: function(callback) {
+        request(
+          {
+            url: `${apiStocks}/stock/${
+              req.params.symbol
+            }/batch?types=quote,news,chart&range=1m&last=10`
+          },
+          (error, response, body) => {
+            if (!error && response.statusCode == 200) {
+              callback(null, JSON.parse(body));
+            }
+          }
+        );
+      },
+      twitter: function(callback) {
+        twitterClient.get(
+          "search/tweets",
+          { q: `$${req.params.symbol} -filter:retweets` },
+          function(error, tweets, response) {
+            if (!error && response.statusCode == 200) {
+              callback(null, tweets);
+            }
+          }
+        );
+      }
+    },
+    function(err, results) {
+      if (!err) {
+        res.send(results);
+      }
+    }
+  );
+});
 
 app.use(express.static("./build"));
 

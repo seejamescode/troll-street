@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { injectGlobal } from "styled-components";
 import App from "./App";
+import { sidebarBreakpoint, sidebarWidth } from "./globals.js";
 import registerServiceWorker from "./registerServiceWorker";
 
 injectGlobal`
@@ -39,12 +40,16 @@ injectGlobal`
     outline: none;
   }
 
+  p {
+    max-width: 40rem;
+  }
+
   #root {
     display: grid;
     grid-gap: 1rem;
 
-    @media (min-width:28rem) {
-      grid-template-columns: 10rem 1fr;
+    @media (min-width: ${sidebarBreakpoint}rem) {
+      grid-template-columns: ${sidebarWidth}rem 1fr;
     }
   }
 `;

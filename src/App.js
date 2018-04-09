@@ -1,19 +1,12 @@
 import React, { Component } from "react";
 import { DebounceInput } from "react-debounce-input";
-import styled, { injectGlobal } from "styled-components";
+import styled from "styled-components";
 import Stock from "./Stock";
 
-injectGlobal`
-  body: {
-    overflow: ${props => (props.selectedId !== "" ? "hidden" : null)};
-  }
-`;
 const Main = styled.main`
   display: grid;
   grid-gap: 1rem;
   grid-template-columns: repeat(auto-fill, 16rem);
-  position: relative;
-  width: 100%;
 `;
 
 const Nav = styled.nav`
@@ -42,6 +35,7 @@ const InputContainer = styled.form`
 
     input {
       border-bottom-color: var(--green-hover);
+      border-radius: 0px;
       color: var(--green-hover);
     }
   }
@@ -73,18 +67,51 @@ class App extends Component {
   state = {
     searchFocused: false,
     selectedId: "",
-    symbols: []
+    symbols: [
+      {
+        id: 1
+      },
+      {
+        id: 2
+      },
+      {
+        id: 3
+      },
+      {
+        id: 4
+      },
+      {
+        id: 5
+      },
+      {
+        id: 6
+      },
+      {
+        id: 7
+      },
+      {
+        id: 8
+      },
+      {
+        id: 9
+      },
+      {
+        id: 10
+      }
+    ]
   };
 
   componentDidMount() {
     this.fetchSymbols();
   }
 
-  componentDidUpdate() {
-    if (this.state.selectedId === "") {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.selectedId !== "" && this.state.selectedId === "") {
       document.getElementsByTagName("body")[0].style.overflow = "initial";
-    } else {
+      document.getElementsByTagName("body")[0].style.position = "initial";
+    } else if (prevState.selectedId === "" && this.state.selectedId !== "") {
       document.getElementsByTagName("body")[0].style.overflow = "hidden";
+      document.getElementsByTagName("body")[0].style.position = "fixed";
     }
   }
 
@@ -96,13 +123,12 @@ class App extends Component {
       .then(symbols => {
         this.setState({
           selectedId: "",
-          symbols: symbols.map(item => {
-            const name = item.name ? item.name : item.companyName;
-            const id = `${item.symbol}-${name}`;
+          symbols: Object.values(symbols).map(item => {
             return {
-              id,
-              name,
-              symbol: item.symbol
+              chart: item.chart,
+              id: `${item.quote.symbol}-${item.quote.companyName}`,
+              name: item.quote.companyName,
+              symbol: item.quote.symbol
             };
           })
         });
@@ -118,7 +144,7 @@ class App extends Component {
         <header>
           <Nav>
             <Title>
-              <a href="./">Trollstreet</a>
+              <a href="./">Troll Street</a>
             </Title>
             <InputContainer searchFocused={this.state.searchFocused}>
               <DebounceInput
@@ -135,16 +161,14 @@ class App extends Component {
         <Main>
           {this.state.symbols.map(item => (
             <Stock
-              hide={
-                this.state.selectedId !== "" &&
-                item.id !== this.state.selectedId
-              }
               key={item.id}
               id={item.id}
               name={item.name}
-              onClick={id => this.setState({ selectedId: id })}
+              onClick={id => {
+                console.log(id);
+                this.setState({ selectedId: id });
+              }}
               open={item.id === this.state.selectedId}
-              selectedId={this.state.selectedId}
               symbol={item.symbol}
             />
           ))}
