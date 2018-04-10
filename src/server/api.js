@@ -133,7 +133,7 @@ module.exports = app => {
             {
               url: `${apiStocks}/stock/${
                 req.params.symbol
-              }/batch?types=quote,news,chart&range=dynamic&last=10`
+              }/batch?types=quote,news,chart&range=1m&last=10`
             },
             (error, response, body) => {
               if (!error && response.statusCode == 200) {

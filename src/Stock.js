@@ -111,9 +111,8 @@ export default class Stock extends Component {
       })
         .then(response => response.json())
         .then(data => {
-          console.log(data.iex.news);
           this.setState({
-            chart: data.iex.chart.data.map(item => {
+            chart: data.iex.chart.map(item => {
               return {
                 date: new Date(item.date),
                 close: item.close
