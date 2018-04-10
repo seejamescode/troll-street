@@ -41,8 +41,13 @@ injectGlobal`
     outline: none;
   }
 
-  p {
-    max-width: 40rem;
+  a, p {
+    max-width: 35rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    padding-top: 2rem;
   }
 
   #root {

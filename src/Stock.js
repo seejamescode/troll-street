@@ -6,12 +6,12 @@ import { sidebarBreakpoint, sidebarWidth, stockSize } from "./globals.js";
 const expandUp = keyframes`
   0% {
       opacity: 0;
-      transform: translateY(10%) scale(0.8);
+      transform: translateY(5%) scale(0.9);
   }
 
   100% {
       opacity: 1;
-      transform: translateY(0%) scale(1) scaleY(1);
+      transform: translateY(0%) scale(1);
   }
 `;
 
@@ -85,6 +85,11 @@ const Price = styled.p`
   transform: translate(-0.45rem, 0.5rem);
 `;
 
+const Story = styled.a`
+  font-style: italic;
+  padding-top: 1rem;
+`;
+
 const Symbol = styled.h2`
   font-size: 2rem;
   transform: translateX(-0.25rem);
@@ -106,6 +111,7 @@ export default class Stock extends Component {
       })
         .then(response => response.json())
         .then(data => {
+          console.log(data.iex.news);
           this.setState({
             chart: data.iex.chart.data.map(item => {
               return {
@@ -114,6 +120,7 @@ export default class Stock extends Component {
               };
             }),
             latestPrice: data.iex.quote.latestPrice,
+            news: data.iex.news,
             tweets: data.twitter.statuses
           });
         })
@@ -124,7 +131,6 @@ export default class Stock extends Component {
   }
 
   render() {
-    console.log(this.state);
     return (
       <Card open={this.props.open} openFocused={this.state.openFocused}>
         <Closed
@@ -184,9 +190,25 @@ export default class Stock extends Component {
               </VictoryChart>
             </Chart>
           ) : null}
+          <br />
+          <h3>Tweets</h3>
           {this.state.tweets
             ? this.state.tweets.map(tweet => (
                 <Tweet key={tweet.id}>“{tweet.text}”</Tweet>
+              ))
+            : null}
+          <br />
+          <h3>News</h3>
+          {this.state.news
+            ? this.state.news.map(story => (
+                <Story
+                  href={story.url}
+                  key={story.headline}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {story.headline}
+                </Story>
               ))
             : null}
           <Close onClick={() => this.props.onClick("")} open={this.props.open}>
