@@ -51,6 +51,7 @@ const InputContainer = styled.form`
     font-size: 1rem;
     max-width: 100%;
     padding-left: 1ch;
+    text-shadow: none;
     text-transform: uppercase;
 
     &:focus {

@@ -9,7 +9,7 @@ injectGlobal`
   :root {
     --black: #1A1717;
     --green: #87DE6D;
-    --green-hover: #fff;
+    --green-hover: #CED994;
   }
 
   * {
@@ -18,6 +18,7 @@ injectGlobal`
     font-family: monospace;
     font-weight: 400;
     margin: 0;
+    transition: box-shadow 0.2s linear, text-shadow 0.2s linear;
   }
 
   html {
@@ -36,9 +37,9 @@ injectGlobal`
   }
 
   a:focus, a:hover, button:focus, button:focus *, button:hover, button:hover * {
-    color: var(--green-hover);
     cursor: pointer;
     outline: none;
+    text-shadow: 0 0 0.01rem var(--green-hover), 0 0 2px rgba(255,255,255,0.8);
   }
 
   a, p {

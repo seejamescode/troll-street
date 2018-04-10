@@ -26,6 +26,7 @@ const Card = styled.div`
   &:focus,
   &:hover {
     border-color: var(--green-hover);
+    box-shadow: 0 0 0.25rem var(--green);
     outline: none;
   }
 `;
