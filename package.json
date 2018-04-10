@@ -12,14 +12,14 @@
     "react-debounce-input": "^3.2.0",
     "react-dom": "^16.3.1",
     "react-scripts": "1.1.4",
-    "styled-components": "^3.2.5"
+    "styled-components": "^3.2.5",
+    "victory": "^0.25.7"
   },
   "scripts": {
     "build": "yarn build:client && yarn build:server",
     "build:client": "react-scripts build",
     "build:server": "NODE_ENV=production babel src/server -d build/server",
-    "deploy":
-      "yarn build && now -e NODE_ENV=\"production\" && now alias && now scale trollstreet.now.sh 1 1",
+    "deploy": "yarn build && now -e NODE_ENV=\"production\" && now alias && now scale trollstreet.now.sh 1 1",
     "dev": "concurrently \"yarn dev:server\" \"yarn dev:client\"",
     "dev:client": "react-scripts start",
     "dev:server": "PORT=8081 babel-watch ./src/server/index.js",
@@ -46,6 +46,8 @@
     }
   },
   "babel": {
-    "presets": ["env"]
+    "presets": [
+      "env"
+    ]
   }
 }

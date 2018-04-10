@@ -125,7 +125,6 @@ class App extends Component {
           selectedId: "",
           symbols: Object.values(symbols).map(item => {
             return {
-              chart: item.chart,
               id: `${item.quote.symbol}-${item.quote.companyName}`,
               name: item.quote.companyName,
               symbol: item.quote.symbol

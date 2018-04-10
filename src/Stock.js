@@ -1,6 +1,19 @@
 import React, { Component } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+import { VictoryAxis, VictoryChart, VictoryLine } from "victory";
 import { sidebarBreakpoint, sidebarWidth, stockSize } from "./globals.js";
+
+const expandUp = keyframes`
+  0% {
+      opacity: 0;
+      transform: translateY(10%) scale(0.8);
+  }
+
+  100% {
+      opacity: 1;
+      transform: translateY(0%) scale(1) scaleY(1);
+  }
+`;
 
 const Card = styled.div`
   border: 1px solid var(--green);
@@ -15,6 +28,10 @@ const Card = styled.div`
     border-color: var(--green-hover);
     outline: none;
   }
+`;
+
+const Chart = styled.div`
+  max-width: 75vh;
 `;
 
 const Close = styled.button`
@@ -39,6 +56,7 @@ const Closed = styled.button`
 `;
 
 const Opened = styled.section`
+  animation: ${expandUp} 300ms ease-in;
   background: var(--black);
   border: 1px solid var(--green);
   display: ${props => (props.open ? "flex" : "none")};
@@ -89,6 +107,12 @@ export default class Stock extends Component {
         .then(response => response.json())
         .then(data => {
           this.setState({
+            chart: data.iex.chart.data.map(item => {
+              return {
+                date: new Date(item.date),
+                close: item.close
+              };
+            }),
             latestPrice: data.iex.quote.latestPrice,
             tweets: data.twitter.statuses
           });
@@ -100,6 +124,7 @@ export default class Stock extends Component {
   }
 
   render() {
+    console.log(this.state);
     return (
       <Card open={this.props.open} openFocused={this.state.openFocused}>
         <Closed
@@ -120,20 +145,45 @@ export default class Stock extends Component {
           open={this.props.open}
           role="dialog"
         >
-          <div
-            style={{
-              background: "var(--black)",
-              padding: ".5rem 0 1rem 0",
-              position: "sticky",
-              top: "0"
-            }}
-          >
-            <Symbol id={`${this.props.id}-title`}>${this.props.symbol}</Symbol>
-            <p id={`${this.props.id}-description`}>{this.props.name}</p>
-            {this.state.latestPrice ? (
-              <Price>${this.state.latestPrice}</Price>
-            ) : null}
-          </div>
+          <Symbol id={`${this.props.id}-title`}>${this.props.symbol}</Symbol>
+          <p id={`${this.props.id}-description`}>{this.props.name}</p>
+          {this.state.latestPrice ? (
+            <Price>${this.state.latestPrice}</Price>
+          ) : null}
+          {this.state.chart ? (
+            <Chart>
+              <VictoryChart
+                animate={{ duration: 300, easing: "cubicOut" }}
+                scale={{ x: "time" }}
+                style={{
+                  axis: { stroke: "var(--green)" },
+                  labels: { color: "var(--green)" }
+                }}
+              >
+                <VictoryLine
+                  data={this.state.chart}
+                  style={{
+                    data: { stroke: "var(--green)" }
+                  }}
+                  x="date"
+                  y="close"
+                />
+                <VictoryAxis
+                  style={{
+                    axis: { stroke: "var(--green)" },
+                    tickLabels: { fill: "var(--green)" }
+                  }}
+                />
+                <VictoryAxis
+                  dependentAxis
+                  style={{
+                    axis: { stroke: "var(--green)" },
+                    tickLabels: { fill: "var(--green)" }
+                  }}
+                />
+              </VictoryChart>
+            </Chart>
+          ) : null}
           {this.state.tweets
             ? this.state.tweets.map(tweet => (
                 <Tweet key={tweet.id}>“{tweet.text}”</Tweet>

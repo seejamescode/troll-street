@@ -27,6 +27,7 @@ injectGlobal`
   body {
     background: var(--black);
     padding: 1rem;
+    width: 100%;
   }
 
   a {
