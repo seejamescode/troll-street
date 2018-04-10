@@ -64,7 +64,7 @@ const Opened = styled.section`
   height: calc(100vh - 2rem);
   left: 1rem;
   overflow-y: scroll;
-  padding: 0 1rem 1rem 1rem;
+  padding: 0.5rem 1rem 1rem 1rem;
   position: fixed;
   top: 1rem;
   width: calc(100vw - 2rem);
