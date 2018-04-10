@@ -17,15 +17,14 @@
   "scripts": {
     "build": "yarn build:client && yarn build:server",
     "build:client": "react-scripts build",
-    "build:server":
-      "NODE_ENV=production babel --out-file ./build/server.js < ./src/server.js --presets=env",
+    "build:server": "NODE_ENV=production babel src/server -d build/server",
     "deploy":
       "yarn build && now -e NODE_ENV=\"production\" && now alias && now scale trollstreet.now.sh 1 1",
     "dev": "concurrently \"yarn dev:server\" \"yarn dev:client\"",
     "dev:client": "react-scripts start",
-    "dev:server": "PORT=8081 babel-watch ./src/server.js",
+    "dev:server": "PORT=8081 babel-watch ./src/server/index.js",
     "now-build": "true",
-    "now-start": "PORT=8081 NODE_ENV=production node build/server.js",
+    "now-start": "PORT=8081 NODE_ENV=production node build/server/index.js",
     "start": "yarn dev"
   },
   "dependencies": {
@@ -33,7 +32,6 @@
     "compression": "^1.7.2",
     "express": "^4.16.3",
     "fuse.js": "^3.2.0",
-    "node-html-parser": "^1.1.6",
     "now-env": "^3.0.4",
     "request": "^2.85.0",
     "twitter": "^1.7.1"
