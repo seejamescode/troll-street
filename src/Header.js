@@ -1,15 +1,20 @@
 import React, { Component } from "react";
 import { DebounceInput } from "react-debounce-input";
 import styled from "styled-components";
+import { sidebarBreakpoint } from "./globals";
 
 const Nav = styled.nav`
-  padding-top: 1rem;
-  position: sticky;
+  background: var(--black);
   top: 1rem;
 
   p {
     font-size: 0.75rem;
     padding-top: 1rem;
+  }
+
+  @media (min-width: ${sidebarBreakpoint}rem) {
+    padding-top: 1rem;
+    position: sticky;
   }
 `;
 
@@ -68,32 +73,34 @@ class Header extends Component {
 
   render() {
     return (
-      <Nav>
-        <Title>
-          <a href="./">Troll Street</a>
-        </Title>
-        <InputContainer searchFocused={this.state.searchFocused}>
-          <DebounceInput
-            debounceTimeout={500}
-            minLength={0}
-            onBlur={() => this.setState({ searchFocused: false })}
-            onChange={e => this.props.onChange(e.target.value)}
-            onFocus={() => this.setState({ searchFocused: true })}
-            placeholder="SNAP"
-          />
-        </InputContainer>
-        <p>
-          Find out how the internet trolls feel about your stock investments.
-          Made by{" "}
-          <a
-            href="https://twitter.com/seejamescode"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            James Y Rauhut
-          </a>.
-        </p>
-      </Nav>
+      <header>
+        <Nav>
+          <Title>
+            <a href="./">Troll Street</a>
+          </Title>
+          <InputContainer searchFocused={this.state.searchFocused}>
+            <DebounceInput
+              debounceTimeout={500}
+              minLength={0}
+              onBlur={() => this.setState({ searchFocused: false })}
+              onChange={e => this.props.onChange(e.target.value)}
+              onFocus={() => this.setState({ searchFocused: true })}
+              placeholder="SNAP"
+            />
+          </InputContainer>
+          <p>
+            Find out how the internet trolls feel about your stock investments.
+            Made by{" "}
+            <a
+              href="https://twitter.com/seejamescode"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              James Y Rauhut
+            </a>.
+          </p>
+        </Nav>
+      </header>
     );
   }
 }
